@@ -34,8 +34,11 @@ import java.util.concurrent.Callable
 
 @CacheableTask
 open class ShadeJar: Jar(), ShadeSpec {
-    private var transformers: MutableList<Transformer> = mutableListOf()
-    private var relocators:   MutableList<Relocator>   = mutableListOf()
+    @Nested
+    var transformers: MutableList<Transformer> = mutableListOf()
+
+    @Nested
+    var relocators: MutableList<Relocator> = mutableListOf()
 
     @get:Optional
     @get:Classpath
@@ -99,11 +102,11 @@ open class ShadeJar: Jar(), ShadeSpec {
 
         this.inputs.property("minimize", Callable { minimizeJar })
         this.outputs.doNotCacheIf("Has one or more transforms or relocators that are not cacheable", Spec {
-//            for (transformer in transformers) {
-//                if (!isCacheableTransform(transformer.getClass())) {
-//                    return@Spec true
-//                }
-//            }
+            for (transformer in transformers) {
+                if (!isCacheable(transformer::class.java)) {
+                    return@Spec true
+                }
+            }
 
             for (relocator in relocators) {
                 if (!isCacheable(relocator::class.java)) {
@@ -361,11 +364,11 @@ open class ShadeJar: Jar(), ShadeSpec {
     /**
      * Add a relocator of the provided class.
      *
-     * @param relocatorClass the relocator class to add. Must have a no-arg constructor.
+     * @param clazz the relocator class to add. Must have a no-arg constructor.
      * @return this
      */
-    override fun relocate(relocatorClass: Class<out Relocator>): ShadeJar {
-        return relocate(relocatorClass, null)
+    override fun relocate(clazz: Class<out Relocator>): ShadeJar {
+        return relocate(clazz, null)
     }
 
     private fun <R : Relocator> addRelocator(relocator: R, configure: Action<R>?) {
@@ -376,35 +379,17 @@ open class ShadeJar: Jar(), ShadeSpec {
     /**
      * Add a relocator of the provided class and configure.
      *
-     * @param relocatorClass the relocator class to add. Must have a no-arg constructor
+     * @param clazz the relocator class to add. Must have a no-arg constructor
      * @param configure the configuration for the relocator
      * @return this
      */
-    override fun <R : Relocator> relocate(relocatorClass: Class<R>, configure: Action<R>?): ShadeJar {
-        val relocator = relocatorClass.getDeclaredConstructor().newInstance()
+    override fun <R : Relocator> relocate(clazz: Class<R>, configure: Action<R>?): ShadeJar {
+        val relocator = clazz.getDeclaredConstructor().newInstance()
         addRelocator(relocator, configure)
         return this
     }
 
-    private fun isCacheable(clazz: Class<out Any?>): Boolean {
+    private fun isCacheable(clazz: Class<out Any>): Boolean {
         return clazz.isAnnotationPresent(Cacheable::class.java)
     }
-
-//    @Nested
-//    fun getTransformers(): List<Transformer> {
-//        return transformers
-//    }
-//
-//    fun setTransformers(transformers: MutableList<Transformer>) {
-//        this.transformers = transformers
-//    }
-
-//    @Nested
-//    fun getRelocators(): List<Relocator> {
-//        return relocators
-//    }
-//
-//    fun setRelocators(relocators: MutableList<Relocator>) {
-//        this.relocators = relocators
-//    }
 }
