@@ -36,26 +36,26 @@ class PatternRelocator
 
     @Input
     @Optional
-    private val pattern: String = pattern.replace('/', '.')
+    val pattern: String = pattern.replace('/', '.')
 
     @Input
     @Optional
-    private val shadedPattern: String = shadedPattern.replace('/', '.')
+    val shadedPattern: String = shadedPattern.replace('/', '.')
 
     @Input
-    private val pathPattern: String = pattern.replace('.', '/')
+    val pathPattern: String = pattern.replace('.', '/')
 
     @Input
-    private val shadedPathPattern: String = shadedPattern.replace('.', '/')
+    val shadedPathPattern: String = shadedPattern.replace('.', '/')
 
     @Input
-    private val includes: MutableSet<String> = normalizePatterns(includes)
+    val includes: MutableSet<String> = normalizePatterns(includes)
 
     @Input
-    private val excludes: MutableSet<String> = normalizePatterns(excludes)
+    val excludes: MutableSet<String> = normalizePatterns(excludes)
 
     @Input
-    private val rawString: Boolean = rawString
+    val rawString: Boolean = rawString
 
     fun include(pattern: String): PatternRelocator {
         includes.addAll(normalizePatterns(listOf(pattern)))

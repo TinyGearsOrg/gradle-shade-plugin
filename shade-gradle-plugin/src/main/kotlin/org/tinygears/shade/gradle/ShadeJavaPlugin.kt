@@ -13,15 +13,16 @@
  */
 package org.tinygears.shade.gradle
 
+import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.artifacts.Dependency
+import org.gradle.api.Task
 import org.gradle.api.attributes.Bundling
 import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.LibraryElements
 import org.gradle.api.attributes.Usage
 import org.gradle.api.component.AdhocComponentWithVariants
-import org.gradle.api.plugins.JavaPluginConvention
+import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.configuration.project.ProjectConfigurationActionContainer
 import org.tinygears.shade.gradle.ShadePlugin.Companion.SHADE_GROUP
@@ -64,7 +65,8 @@ class ShadeJavaPlugin
     }
 
     private fun configureShadowTask(project: Project) {
-        val convention: JavaPluginConvention = project.convention.getPlugin(JavaPluginConvention::class.java)
+        val extension = project.extensions.getByType(JavaPluginExtension::class.java)
+
         project.tasks.register(SHADE_TASK_NAME, ShadeJar::class.java) { shade ->
             shade.group = SHADE_GROUP
             shade.description = "Create a combined JAR of project and runtime dependencies"
@@ -77,21 +79,25 @@ class ShadeJavaPlugin
                 project.configurations.findByName(ShadePlugin.PROVIDED_CONFIGURATION_NAME)
             )
 
-            shade.doFirst {
-                if (!files.isEmpty) {
-                    val libs = libsProvider.get()
-                    libs.addAll(files.map { file -> file.name })
-                    shade.manifest.attributes(
-                        mapOf<String, String>(
-                            Pair("Class-Path",
-                                libs.filterNotNull().joinToString(" ", transform = { it.toString() })
+            // explicitly use an anonymous class here instead of a lambda to avoid gradle warnings,
+            // see: https://docs.gradle.org/7.5.1/userguide/validation_problems.html#implementation_unknown
+            shade.doFirst(object: Action<Task> {
+                override fun execute(t: Task) {
+                    if (!files.isEmpty) {
+                        val libs = libsProvider.get()
+                        libs.addAll(files.map { file -> file.name })
+                        shade.manifest.attributes(
+                            mapOf<String, String>(
+                                Pair("Class-Path",
+                                    libs.filterNotNull().joinToString(" ", transform = { it.toString() })
+                                )
                             )
                         )
-                    )
+                    }
                 }
-            }
+            })
 
-            shade.from(convention.sourceSets.getByName("main").output)
+            shade.from(extension.sourceSets.getByName("main").output)
             shade.configurations = if (project.configurations.findByName("runtimeClasspath") != null) {
                 mutableListOf(project.configurations.getByName("runtimeClasspath"))
             } else {
@@ -107,8 +113,4 @@ class ShadeJavaPlugin
 
         project.artifacts.add(ShadePlugin.PROVIDED_CONFIGURATION_NAME, project.tasks.named(SHADE_TASK_NAME))
     }
-}
-
-private fun Dependency.asString(): String {
-    return "${group}:${name}:${version}"
 }
