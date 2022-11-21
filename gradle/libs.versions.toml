@@ -1,0 +1,19 @@
+[versions]
+kotlin        = "1.7.20"
+bat           = "8e4390b0ad"
+
+[plugins]
+kotlin        = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+
+[libraries]
+kotlin-gradle     = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+kotlin-stdlibJdk8 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8", version.ref = "kotlin" }
+
+bat-common        = { module = "com.github.TinyGearsOrg.bat:classfile", version.ref = "bat" }
+bat-classfile     = { module = "com.github.TinyGearsOrg.bat:common", version.ref = "bat" }
+
+ant         = "org.apache.ant:ant:1.10.12"
+jdependency = "org.vafer:jdependency:2.7.0"
+r8          = "com.android.tools:r8:3.3.75"
+
+junit = "junit:junit:4.13.2"

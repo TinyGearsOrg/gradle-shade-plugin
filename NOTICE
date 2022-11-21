@@ -1,0 +1,7 @@
+Shade - tools for shading of java classfiles
+Copyright (c) 2022 Thomas Neidhart
+
+This project includes work from the maven-shade-plugin and the gradle-shadow-plugin,
+both licensed under the Apache License.
+
+Copyright (c) 2013 John Engelman All Rights Reserved.
