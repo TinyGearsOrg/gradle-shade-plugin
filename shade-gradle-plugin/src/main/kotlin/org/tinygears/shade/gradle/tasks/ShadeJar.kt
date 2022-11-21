@@ -193,11 +193,11 @@ open class ShadeJar: Jar(), ShadeSpec {
     /**
      * Configure inclusion/exclusion of module and project dependencies into uber jar.
      *
-     * @param c the configuration of the filter
+     * @param configure the configuration of the filter
      * @return this
      */
-    override fun dependencies(c: Action<DependencyFilter>?): ShadeJar {
-        c?.execute(dependencyFilter)
+    override fun dependencies(configure: Action<DependencyFilter>?): ShadeJar {
+        configure?.execute(dependencyFilter)
         return this
     }
 
@@ -347,48 +347,45 @@ open class ShadeJar: Jar(), ShadeSpec {
         return this
     }
 
-//    /**
-//     * Add a relocator instance.
-//     *
-//     * @param relocator the relocator instance to add
-//     * @return this
-//     */
-//    fun relocate(relocator: Relocator): ShadowJar {
-//        addRelocator<Relocator>(relocator, null)
-//        return this
-//    }
+    /**
+     * Add a relocator instance.
+     *
+     * @param relocator the relocator instance to add
+     * @return this
+     */
+    override fun relocate(relocator: Relocator): ShadeJar {
+        addRelocator(relocator, null)
+        return this
+    }
 
-//    /**
-//     * Add a relocator of the provided class.
-//     *
-//     * @param relocatorClass the relocator class to add. Must have a no-arg constructor.
-//     * @return this
-//     */
-//    @Throws(InstantiationException::class, IllegalAccessException::class, NoSuchMethodException::class, InvocationTargetException::class)
-//    fun relocate(relocatorClass: Class<out Relocator?>?): ShadowJar {
-//        return relocate(relocatorClass, null)
-//    }
-//
+    /**
+     * Add a relocator of the provided class.
+     *
+     * @param relocatorClass the relocator class to add. Must have a no-arg constructor.
+     * @return this
+     */
+    override fun relocate(relocatorClass: Class<out Relocator>): ShadeJar {
+        return relocate(relocatorClass, null)
+    }
 
     private fun <R : Relocator> addRelocator(relocator: R, configure: Action<R>?) {
         configure?.execute(relocator)
         relocators.add(relocator)
     }
 
-//    /**
-//     * Add a relocator of the provided class and configure.
-//     *
-//     * @param relocatorClass the relocator class to add. Must have a no-arg constructor
-//     * @param configure the configuration for the relocator
-//     * @return this
-//     */
-//    @Throws(InstantiationException::class, IllegalAccessException::class, NoSuchMethodException::class, InvocationTargetException::class)
-//    fun <R : Relocator?> relocate(relocatorClass: Class<R>, configure: Action<R>?): ShadowJar {
-//        val relocator = relocatorClass.getDeclaredConstructor().newInstance()
-//        addRelocator(relocator, configure)
-//        return this
-//    }
-//
+    /**
+     * Add a relocator of the provided class and configure.
+     *
+     * @param relocatorClass the relocator class to add. Must have a no-arg constructor
+     * @param configure the configuration for the relocator
+     * @return this
+     */
+    override fun <R : Relocator> relocate(relocatorClass: Class<R>, configure: Action<R>?): ShadeJar {
+        val relocator = relocatorClass.getDeclaredConstructor().newInstance()
+        addRelocator(relocator, configure)
+        return this
+    }
+
     private fun isCacheable(clazz: Class<out Any?>): Boolean {
         return clazz.isAnnotationPresent(Cacheable::class.java)
     }

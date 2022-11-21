@@ -24,12 +24,12 @@ interface ShadeSpec: CopySpec {
     //fun mergeServiceFiles(configureClosure: Action<ServiceFileTransformer>?): ShadeSpec
     //fun mergeGroovyExtensionModules(): ShadeSpec
     //fun append(resourcePath: String?): ShadeSpec
+
     fun relocate(pattern: String, destination: String): ShadeSpec
     fun relocate(pattern: String, destination: String, configure: Action<Relocator>?): ShadeSpec
-    //fun relocate(relocator: Relocator): ShadeSpec
+    fun relocate(relocator: Relocator): ShadeSpec
+    fun relocate(clazz: Class<out Relocator>): ShadeSpec
+    fun <R: Relocator> relocate(clazz: Class<R>, configure: Action<R>?): ShadeSpec
 
-    //fun relocate(clazz: Class<out Relocator>?): ShadeSpec
-
-    //fun <R: Relocator> relocate(clazz: Class<R>, configure: Action<R>?): ShadeSpec
     val stats: ShadeStats
 }
