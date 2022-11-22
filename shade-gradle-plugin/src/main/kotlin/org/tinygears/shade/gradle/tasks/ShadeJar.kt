@@ -204,50 +204,44 @@ open class ShadeJar: Jar(), ShadeSpec {
         return this
     }
 
-//    /**
-//     * Add a Transformer instance for modifying JAR resources and configure.
-//     *
-//     * @param clazz the transformer to add. Must have a no-arg constructor
-//     * @return this
-//     */
-//    @Throws(InstantiationException::class, IllegalAccessException::class, NoSuchMethodException::class, InvocationTargetException::class)
-//    fun transform(clazz: Class<out Transformer?>): ShadowJar {
-//        return transform(clazz, null)
-//    }
+    /**
+     * Add a Transformer instance for modifying JAR resources and configure.
+     *
+     * @param clazz the transformer to add. Must have a no-arg constructor
+     * @return this
+     */
+    override fun transform(clazz: Class<out Transformer>): ShadeJar {
+        return transform(clazz, null)
+    }
 
-//    /**
-//     * Add a Transformer instance for modifying JAR resources and configure.
-//     *
-//     * @param clazz the transformer class to add. Must have no-arg constructor
-//     * @param c the configuration for the transformer
-//     * @return this
-//     */
-//    @Throws(InstantiationException::class, IllegalAccessException::class, NoSuchMethodException::class, InvocationTargetException::class)
-//    fun <T : Transformer?> transform(clazz: Class<T?>, c: Action<T>?): ShadowJar {
-//        val transformer: T = clazz.getDeclaredConstructor().newInstance()
-//        addTransform(transformer, c)
-//        return this
-//    }
-//
-//    private fun isCacheableTransform(clazz: Class<out Transformer?>): Boolean {
-//        return clazz.isAnnotationPresent(CacheableTransformer::class.java)
-//    }
+    /**
+     * Add a Transformer instance for modifying JAR resources and configure.
+     *
+     * @param clazz the transformer class to add. Must have no-arg constructor
+     * @param configure the configuration for the transformer
+     * @return this
+     */
+    override fun <T: Transformer> transform(clazz: Class<T>, configure: Action<T>?): ShadeJar {
+        val transformer: T = clazz.getDeclaredConstructor().newInstance()
+        addTransform(transformer, configure)
+        return this
+    }
 
-//    /**
-//     * Add a preconfigured transformer instance.
-//     *
-//     * @param transformer the transformer instance to add
-//     * @return this
-//     */
-//    fun transform(transformer: Transformer): ShadowJar {
-//        addTransform<Transformer>(transformer, null)
-//        return this
-//    }
-//
-//    private fun <T : Transformer?> addTransform(transformer: T, c: Action<T>?) {
-//        c?.execute(transformer)
-//        transformers.add(transformer)
-//    }
+    /**
+     * Add a preconfigured transformer instance.
+     *
+     * @param transformer the transformer instance to add
+     * @return this
+     */
+    override fun transform(transformer: Transformer): ShadeJar {
+        addTransform(transformer, null)
+        return this
+    }
+
+    private fun <T : Transformer> addTransform(transformer: T, c: Action<T>?) {
+        c?.execute(transformer)
+        transformers.add(transformer)
+    }
 
 //    /**
 //     * Syntactic sugar for merging service files in JARs.

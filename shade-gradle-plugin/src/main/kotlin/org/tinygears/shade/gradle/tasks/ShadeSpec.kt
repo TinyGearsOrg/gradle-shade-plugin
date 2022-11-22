@@ -15,10 +15,10 @@ interface ShadeSpec: CopySpec {
     fun minimize(configureClosure: Action<DependencyFilter>?): ShadeSpec
     fun dependencies(configure: Action<DependencyFilter>?): ShadeSpec
 
-    //fun transform(clazz: Class<out Transformer?>?): ShadeSpec
+    fun transform(clazz: Class<out Transformer>): ShadeSpec
+    fun <T: Transformer> transform(clazz: Class<T>, configure: Action<T>?): ShadeSpec
+    fun transform(transformer: Transformer): ShadeSpec
 
-    //fun <T: Transformer> transform(clazz: Class<T>?, configure: Action<T>?): ShadeSpec
-    //fun transform(transformer: Transformer): ShadeSpec
     //fun mergeServiceFiles(): ShadeSpec
     //fun mergeServiceFiles(rootPath: String?): ShadeSpec
     //fun mergeServiceFiles(configureClosure: Action<ServiceFileTransformer>?): ShadeSpec
