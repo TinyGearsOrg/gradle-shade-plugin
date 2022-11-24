@@ -1,6 +1,5 @@
 plugins {
     id("base")
-    id("idea")
 }
 
 tasks.wrapper {

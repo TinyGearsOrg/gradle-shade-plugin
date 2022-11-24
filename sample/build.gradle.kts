@@ -1,4 +1,5 @@
 import org.tinygears.shade.gradle.tasks.ShadeJar
+import org.tinygears.shade.gradle.transformation.ApacheLicenseResourceTransformer
 
 plugins {
     kotlin("jvm") version "1.7.20"

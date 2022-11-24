@@ -1,6 +1,7 @@
 [versions]
 kotlin        = "1.7.20"
 bat           = "8e4390b0ad"
+kotest        = "5.5.4"
 
 [plugins]
 kotlin        = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
@@ -16,4 +17,9 @@ ant         = "org.apache.ant:ant:1.10.12"
 jdependency = "org.vafer:jdependency:2.7.0"
 r8          = "com.android.tools:r8:3.3.75"
 
-junit = "junit:junit:4.13.2"
+kotest-runner     = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
+kotest-assertions = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
+
+junit        = "junit:junit:4.13.2"
+commons-lang = "org.apache.commons:commons-lang3:3.12.0"
+commons-io   = "commons-io:commons-io:2.11.0"

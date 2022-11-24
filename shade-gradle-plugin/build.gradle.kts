@@ -2,6 +2,7 @@ plugins {
     id("module")
     `java-gradle-plugin`
     `java-test-fixtures`
+    id("idea")
 }
 
 group = "org.tinygears"
@@ -18,7 +19,6 @@ dependencies {
     implementation(libs.jdependency)
     implementation(libs.r8)
 }
-
 
 gradlePlugin {
     plugins {
