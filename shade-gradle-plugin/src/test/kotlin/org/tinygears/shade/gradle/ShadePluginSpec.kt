@@ -13,15 +13,15 @@
  */
 package org.tinygears.shade.gradle
 
+import org.gradle.api.plugins.JavaPlugin
 import org.gradle.testfixtures.ProjectBuilder
-import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
-import kotlin.test.Test
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
+import org.tinygears.shade.gradle.tasks.ShadeJar
+import java.io.File
+import kotlin.test.*
 
-class ShadePluginTest: PluginSpecification() {
+class ShadePluginSpec: PluginSpecification() {
 
     @Test
     fun `apply plugin`() {
@@ -33,6 +33,22 @@ class ShadePluginTest: PluginSpecification() {
 
         project.plugins.apply(ShadePlugin::class.java)
         assertTrue(project.plugins.hasPlugin(ShadePlugin::class.java))
+
+        assertNull(project.tasks.findByName("shadeJar"))
+
+        project.plugins.apply(JavaPlugin::class.java)
+
+        val shadeJar = project.tasks.findByName("shadeJar") as ShadeJar
+
+        assertNotNull(shadeJar)
+        assertEquals(shadeJar.archiveBaseName.get(), projectName)
+        assertEquals(shadeJar.destinationDirectory.asFile.get(), File(project.buildDir, "libs"))
+        assertEquals(shadeJar.archiveVersion.get(), version)
+        assertEquals(shadeJar.archiveClassifier.get(), "all")
+        assertEquals(shadeJar.archiveExtension.get(), "jar")
+
+        val providedConfig = project.configurations.findByName("provided")
+        assertTrue(providedConfig?.artifacts?.files?.contains(shadeJar.archiveFile.get().asFile) ?: false)
     }
 
     @ParameterizedTest
