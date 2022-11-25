@@ -78,7 +78,7 @@ abstract class PluginSpecification {
         return """
         plugins {
             id '${javaPlugin}'
-            id 'org.tinygears.shade'
+            id 'org.tinygears.shade' version "${Version.version}"
         }
 
         version = "1.0"

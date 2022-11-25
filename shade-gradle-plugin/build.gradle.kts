@@ -8,6 +8,38 @@ plugins {
 group = "org.tinygears"
 version = Versions.currentOrSnapshot()
 
+val generateTestFixtureSources = task("generateTestFixtureSources") {
+    inputs.property("version", project.version)
+    outputs.dir("$buildDir/generated")
+
+    doFirst {
+        val versionFile = file("$buildDir/generated/org/tinygears/shade/gradle/Version.kt")
+        versionFile.parentFile.mkdirs()
+        versionFile.writeText(
+            """
+            |package org.tinygears.shade.gradle
+            |
+            |object Version {
+	        |    val version: String
+            |        get() = "${project.version}"
+            |}
+            """.trimMargin()
+        )
+    }
+}
+
+tasks.compileTestFixturesKotlin {
+    dependsOn(generateTestFixtureSources)
+}
+
+sourceSets {
+    testFixtures {
+        kotlin {
+            srcDir("$buildDir/generated")
+        }
+    }
+}
+
 dependencies {
     implementation(kotlin("stdlib"))
     implementation(gradleApi())
