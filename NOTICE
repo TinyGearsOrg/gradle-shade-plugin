@@ -1,4 +1,4 @@
-Shade - tools for shading of java classfiles
+Shade - tools for shading of jvm classfiles
 Copyright (c) 2022 Thomas Neidhart
 
 This project includes work from the maven-shade-plugin and the gradle-shadow-plugin,
