@@ -7,6 +7,8 @@ plugins {
     `maven-publish`
 }
 
+val versionCatalog = project.extensions.getByType<VersionCatalogsExtension>().named("libs")
+
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 
@@ -57,6 +59,14 @@ fun printResults(desc: TestDescriptor, result: TestResult) {
         println(separationLine)
         println(testResultLine)
         println(separationLine)
+    }
+}
+
+testing {
+    suites {
+        getByName("test", JvmTestSuite::class) {
+            useJUnitJupiter(versionCatalog.findVersion("jupiter").get().requiredVersion)
+        }
     }
 }
 

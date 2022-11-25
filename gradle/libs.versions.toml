@@ -2,6 +2,7 @@
 kotlin        = "1.7.20"
 bat           = "8e4390b0ad"
 kotest        = "5.5.4"
+jupiter       = "5.9.1"
 
 [plugins]
 kotlin        = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
@@ -16,6 +17,9 @@ bat-classfile     = { module = "com.github.TinyGearsOrg.bat:common", version.ref
 ant         = "org.apache.ant:ant:1.10.12"
 jdependency = "org.vafer:jdependency:2.7.0"
 r8          = "com.android.tools:r8:3.3.75"
+
+jupiter-api       = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "jupiter" }
+jupiter-params    = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "jupiter" }
 
 kotest-runner     = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
 kotest-assertions = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }

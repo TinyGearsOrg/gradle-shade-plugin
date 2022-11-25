@@ -22,13 +22,13 @@ import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.LibraryElements
 import org.gradle.api.attributes.Usage
 import org.gradle.api.component.AdhocComponentWithVariants
-import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.configuration.project.ProjectConfigurationActionContainer
 import org.tinygears.shade.gradle.ShadePlugin.Companion.SHADE_GROUP
 import org.tinygears.shade.gradle.ShadePlugin.Companion.SHADE_RUNTIME_ELEMENT
 import org.tinygears.shade.gradle.ShadePlugin.Companion.SHADE_TASK_NAME
 import org.tinygears.shade.gradle.tasks.ShadeJar
+import org.tinygears.shade.gradle.util.GradleVersionTool
 import javax.inject.Inject
 
 class ShadeJavaPlugin
@@ -65,8 +65,6 @@ class ShadeJavaPlugin
     }
 
     private fun configureShadowTask(project: Project) {
-        val extension = project.extensions.getByType(JavaPluginExtension::class.java)
-
         project.tasks.register(SHADE_TASK_NAME, ShadeJar::class.java) { shade ->
             shade.group = SHADE_GROUP
             shade.description = "Create a combined JAR of project and runtime dependencies"
@@ -97,7 +95,7 @@ class ShadeJavaPlugin
                 }
             })
 
-            shade.from(extension.sourceSets.getByName("main").output)
+            shade.from(GradleVersionTool.getSourceSetContainer(project).getByName("main").output)
             shade.configurations = if (project.configurations.findByName("runtimeClasspath") != null) {
                 mutableListOf(project.configurations.getByName("runtimeClasspath"))
             } else {

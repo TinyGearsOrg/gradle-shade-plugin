@@ -18,6 +18,12 @@ dependencies {
     implementation(libs.ant)
     implementation(libs.jdependency)
     implementation(libs.r8)
+
+    testFixturesApi(libs.jupiter.api)
+    testFixturesApi(libs.jupiter.params)
+    testFixturesImplementation(libs.commons.lang)
+    testFixturesImplementation(libs.commons.io)
+    testFixturesImplementation(gradleTestKit())
 }
 
 gradlePlugin {

@@ -39,7 +39,7 @@ class DefaultInheritManifest
         val mergeSpec = DefaultManifestMergeSpec()
         mergeSpec.from(inheritPaths)
         inheritMergeSpecs.add(mergeSpec)
-        ConfigureUtil.configure(closure, mergeSpec)
+        closure?.apply { ConfigureUtil.configure(closure, mergeSpec) }
         return this
     }
 

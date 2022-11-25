@@ -25,7 +25,7 @@ internal class ShadeBasePlugin: Plugin<Project> {
     @Override
     override fun apply(project: Project) {
         if (GradleVersion.current() < GradleVersion.version("7.0")) {
-            throw GradleException("This version of the shade plugin supports gradle 7.0+ only. Please upgrade.")
+            throw GradleException("The shade plugin supports gradle 7.0+ only. Please upgrade.")
         }
 
         // Add the extension object
