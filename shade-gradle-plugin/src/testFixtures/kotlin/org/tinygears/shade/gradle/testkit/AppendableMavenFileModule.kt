@@ -24,7 +24,7 @@ class AppendableMavenFileModule constructor(moduleDir: TestFile,
                                             artifactId: String,
                                             version:    String): MavenFileModule(moduleDir, groupId, artifactId, version) {
 
-    private val contents: MutableMap<String, MutableMap<String, String>> = mutableMapOf<String, MutableMap<String, String>>().withDefault { mutableMapOf() }
+    private val contents: MutableMap<String, MutableMap<String, String>> = mutableMapOf()
     private val files: MutableMap<String, File> = mutableMapOf()
 
     fun use(file: File): AppendableMavenFileModule {
@@ -42,7 +42,7 @@ class AppendableMavenFileModule constructor(moduleDir: TestFile,
     }
 
     fun insertFile(classifier: String, path: String, content: String): AppendableMavenFileModule {
-        contents[classifier]?.set(path, content)
+        contents.computeIfAbsent(classifier) { mutableMapOf() }[path] = content
         return this
     }
 

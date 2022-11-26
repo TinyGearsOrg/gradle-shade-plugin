@@ -57,7 +57,7 @@ abstract class PluginSpecification {
                             .withPluginClasspath()
 
     @BeforeEach
-    fun setup() {
+    open fun setup() {
         repo = repo()
         repo.module("junit", "junit", "3.8.2").use(getTestJar()).publish()
 
