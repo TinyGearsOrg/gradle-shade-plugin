@@ -37,6 +37,7 @@ class FilteringSpec: PluginSpecification() {
                implementation 'shade:a:1.0'
                implementation 'shade:b:1.0'
             }
+            
             """.trimIndent()
         )
     }
@@ -65,75 +66,70 @@ class FilteringSpec: PluginSpecification() {
         doesNotContain(output, listOf("a2.properties"))
     }
 
-//    def "exclude dependency"() {
-//        given:
-//        repo.module("shadow", "c", "1.0")
-//            .insertFile("c.properties", "c")
-//            .publish()
-//        repo.module("shadow", "d", "1.0")
-//            .insertFile("d.properties", "d")
-//            .dependsOn("c")
-//            .publish()
-//
-//        buildFile << """
-//        // tag::excludeDep[]
-//        dependencies {
-//            implementation "shadow:d:1.0"
-//        }
-//
-//        shadowJar {
-//            dependencies {
-//                exclude(dependency("shadow:d:1.0"))
-//            }
-//        }
-//        // end::excludeDep[]
-//        """.stripIndent()
-//
-//        when:
-//        run("shadowJar")
-//
-//        then:
-//        contains(output, ["a.properties", "a2.properties", "b.properties", "c.properties"])
-//
-//        and:
-//        doesNotContain(output, ["d.properties"])
-//    }
-//
-//    @Issue("SHADOW-83")
-//    def "exclude dependency using wildcard syntax"() {
-//        given:
-//        repo.module("shadow", "c", "1.0")
-//            .insertFile("c.properties", "c")
-//            .publish()
-//        repo.module("shadow", "d", "1.0")
-//            .insertFile("d.properties", "d")
-//            .dependsOn("c")
-//            .publish()
-//
-//        buildFile << """
-//        // tag::excludeDepWildcard[]
-//        dependencies {
-//            implementation "shadow:d:1.0"
-//        }
-//
-//        shadowJar {
-//            dependencies {
-//                exclude(dependency("shadow:d:.*"))
-//            }
-//        }
-//        // end::excludeDepWildcard[]
-//        """.stripIndent()
-//
-//        when:
-//        run("shadowJar")
-//
-//        then:
-//        contains(output, ["a.properties", "a2.properties", "b.properties", "c.properties"])
-//
-//        and:
-//        doesNotContain(output, ["d.properties"])
-//    }
-//
+    @Test
+    fun `exclude dependency`() {
+        repo.module("shade", "c", "1.0")
+            .insertFile("c.properties", "c")
+            .publish()
+        repo.module("shade", "d", "1.0")
+            .insertFile("d.properties", "d")
+            .dependsOn("c")
+            .publish()
+
+        buildFile.appendText(
+            """
+            // tag::excludeDep[]
+            dependencies {
+                implementation "shade:d:1.0"
+            }
+
+            shadeJar {
+                dependencies {
+                    exclude(dependency("shade:d:1.0"))
+                }
+            }
+            // end::excludeDep[]
+            """.trimIndent()
+        )
+
+        run("shadeJar")
+
+        contains(output, listOf("a.properties", "a2.properties", "b.properties", "c.properties"))
+        doesNotContain(output, listOf("d.properties"))
+    }
+
+    @Test
+    fun `exclude dependency using wildcard syntax`() {
+        repo.module("shade", "c", "1.0")
+            .insertFile("c.properties", "c")
+            .publish()
+        repo.module("shade", "d", "1.0")
+            .insertFile("d.properties", "d")
+            .dependsOn("c")
+            .publish()
+
+        buildFile.appendText(
+            """
+            // tag::excludeDepWildcard[]
+            dependencies {
+                implementation "shade:d:1.0"
+            }
+
+            shadeJar {
+                dependencies {
+                    exclude(dependency("shade:d:.*"))
+                }
+            }
+            // end::excludeDepWildcard[]
+            """.trimIndent()
+        )
+
+        run("shadeJar")
+
+        contains(output, listOf("a.properties", "a2.properties", "b.properties", "c.properties"))
+        doesNotContain(output, listOf("d.properties"))
+    }
+
 //    @Issue("SHADOW-54")
 //    @Ignore("TODO - need to figure out the test pollution here")
 //    def "dependency exclusions affect UP-TO-DATE check"() {
@@ -182,7 +178,7 @@ class FilteringSpec: PluginSpecification() {
 //        and:
 //        doesNotContain(output, ["c.properties"])
 //    }
-//
+
 //    @Issue("SHADOW-62")
 //    @Ignore
 //    def "project exclusions affect UP-TO-DATE check"() {
@@ -234,210 +230,210 @@ class FilteringSpec: PluginSpecification() {
 //        and:
 //        doesNotContain(output, ["a.properties", "c.properties"])
 //    }
-//
-//    def "include dependency, excluding all others"() {
-//        given:
-//        repo.module("shadow", "c", "1.0")
-//            .insertFile("c.properties", "c")
-//            .publish()
-//        repo.module("shadow", "d", "1.0")
-//            .insertFile("d.properties", "d")
-//            .dependsOn("c")
-//            .publish()
-//
-//        file("src/main/java/shadow/Passed.java") << """
-//        package shadow;
-//        public class Passed {}
-//        """.stripIndent()
-//
-//        buildFile << """
-//        dependencies {
-//            implementation "shadow:d:1.0"
-//        }
-//
-//        shadowJar {
-//            dependencies {
-//                include(dependency("shadow:d:1.0"))
-//            }
-//        }
-//        """.stripIndent()
-//
-//        when:
-//        run("shadowJar")
-//
-//        then:
-//        contains(output, ["d.properties", "shadow/Passed.class"])
-//
-//        and:
-//        doesNotContain(output, ["a.properties", "a2.properties", "b.properties", "c.properties"])
-//    }
-//
-//    def "filter project dependencies"() {
-//        given:
-//        buildFile.text = ""
-//
-//        file("settings.gradle") << """
-//            include "client", "server"
-//        """.stripIndent()
-//
-//        file("client/src/main/java/client/Client.java") << """
-//            package client;
-//            public class Client {}
-//        """.stripIndent()
-//
-//        file("client/build.gradle") << """
-//            ${defaultBuildScript}
-//            dependencies { implementation "junit:junit:3.8.2" }
-//        """.stripIndent()
-//
-//        file("server/src/main/java/server/Server.java") << """
-//            package server;
-//            import client.Client;
-//            public class Server {}
-//        """.stripIndent()
-//
-//        file("server/build.gradle") << """
-//            ${defaultBuildScript}
-//
-//            // tag::excludeProject[]
-//            dependencies {
-//              implementation project(":client")
-//            }
-//
-//            shadowJar {
-//               dependencies {
-//                   exclude(project(":client"))
-//               }
-//            }
-//            // end::excludeProject[]
-//        """.stripIndent()
-//
-//        File serverOutput = getFile("server/build/libs/server-1.0-all.jar")
-//
-//        when:
-//        run(":server:shadowJar")
-//
-//        then:
-//        serverOutput.exists()
-//        doesNotContain(serverOutput, [
-//            "client/Client.class",
-//        ])
-//
-//        and:
-//        contains(serverOutput, ["server/Server.class", "junit/framework/Test.class"])
-//    }
-//
-//    def "exclude a transitive project dependency"() {
-//        given:
-//        buildFile.text = ""
-//
-//        file("settings.gradle") << """
-//            include "client", "server"
-//        """.stripIndent()
-//
-//        file("client/src/main/java/client/Client.java") << """
-//            package client;
-//            public class Client {}
-//        """.stripIndent()
-//
-//        file("client/build.gradle") << """
-//            ${defaultBuildScript}
-//            dependencies { implementation "junit:junit:3.8.2" }
-//        """.stripIndent()
-//
-//        file("server/src/main/java/server/Server.java") << """
-//            package server;
-//            import client.Client;
-//            public class Server {}
-//        """.stripIndent()
-//
-//        file("server/build.gradle") << """
-//            ${defaultBuildScript}
-//            dependencies { implementation project(":client") }
-//
-//            // tag::excludeSpec[]
-//            shadowJar {
-//               dependencies {
-//                   exclude(dependency {
-//                       it.moduleGroup == "junit"
-//                   })
-//               }
-//            }
-//            // end::excludeSpec[]
-//        """.stripIndent()
-//
-//        File serverOutput = getFile("server/build/libs/server-1.0-all.jar")
-//
-//        when:
-//        run(":server:shadowJar")
-//
-//        then:
-//        serverOutput.exists()
-//        doesNotContain(serverOutput, [
-//            "junit/framework/Test.class"
-//        ])
-//
-//        and:
-//        contains(serverOutput, [
-//            "client/Client.class",
-//            "server/Server.class"])
-//    }
-//
-//    //http://mail-archives.apache.org/mod_mbox/ant-user/200506.mbox/%3C001d01c57756$6dc35da0$dc00a8c0@CTEGDOMAIN.COM%3E
-//    def "verify exclude precedence over include"() {
-//        given:
-//        buildFile << """
-//            // tag::excludeOverInclude[]
-//            shadowJar {
-//               include "*.jar"
-//               include "*.properties"
-//               exclude "a2.properties"
-//            }
-//            // end::excludeOverInclude[]
-//        """.stripIndent()
-//
-//        when:
-//        run("shadowJar")
-//
-//        then:
-//        contains(output, ["a.properties", "b.properties"])
-//
-//        and:
-//        doesNotContain(output, ["a2.properties"])
-//    }
-//
-//    @Issue("SHADOW-69")
-//    def "handle exclude with circular dependency"() {
-//        given:
-//        repo.module("shadow", "c", "1.0")
-//            .insertFile("c.properties", "c")
-//            .dependsOn("d")
-//            .publish()
-//        repo.module("shadow", "d", "1.0")
-//            .insertFile("d.properties", "d")
-//            .dependsOn("c")
-//            .publish()
-//
-//        buildFile << """
-//        dependencies {
-//            implementation "shadow:d:1.0"
-//        }
-//
-//        shadowJar {
-//            dependencies {
-//                exclude(dependency("shadow:d:1.0"))
-//            }
-//        }
-//        """.stripIndent()
-//
-//        when:
-//        run("shadowJar")
-//
-//        then:
-//        contains(output, ["a.properties", "a2.properties", "b.properties", "c.properties"])
-//
-//        and:
-//        doesNotContain(output, ["d.properties"])
-//    }
-//
+
+    @Test
+    fun `include dependency, excluding all others`() {
+        repo.module("shade", "c", "1.0")
+            .insertFile("c.properties", "c")
+            .publish()
+        repo.module("shade", "d", "1.0")
+            .insertFile("d.properties", "d")
+            .dependsOn("c")
+            .publish()
+
+        file("src/main/java/shade/Passed.java").appendText(
+            """
+            package shade;
+            public class Passed {}
+            """.trimIndent()
+        )
+
+        buildFile.appendText(
+            """
+            dependencies {
+                implementation "shade:d:1.0"
+            }
+
+            shadeJar {
+                dependencies {
+                    include(dependency("shade:d:1.0"))
+                }
+            }
+            """.trimIndent()
+        )
+
+        run("shadeJar")
+
+        contains(output, listOf("d.properties", "shade/Passed.class"))
+        doesNotContain(output, listOf("a.properties", "a2.properties", "b.properties", "c.properties"))
+    }
+
+    @Test
+    fun `filter project dependencies`() {
+        buildFile.writeText("")
+
+        file("settings.gradle").appendText(
+            """
+            include "client", "server"
+            """.trimIndent()
+        )
+
+        file("client/src/main/java/client/Client.java").appendText(
+            """
+            package client;
+            public class Client {}
+            """.trimIndent()
+        )
+
+        file("client/build.gradle").appendText(
+            """
+            ${getDefaultBuildScript()}
+            dependencies { implementation "junit:junit:3.8.2" }
+            """.trimIndent()
+        )
+
+        file("server/src/main/java/server/Server.java").appendText(
+            """
+            package server;
+            import client.Client;
+            public class Server {}
+            """.trimIndent()
+        )
+
+        file("server/build.gradle").appendText(
+            """
+            ${getDefaultBuildScript()}
+
+            // tag::excludeProject[]
+            dependencies {
+              implementation project(":client")
+            }
+
+            shadeJar {
+               dependencies {
+                   exclude(project(":client"))
+               }
+            }
+            // end::excludeProject[]
+            """.trimIndent()
+        )
+
+        val serverOutput = getFile("server/build/libs/server-1.0-all.jar")
+
+        run(":server:shadeJar")
+
+        serverOutput.exists()
+        doesNotContain(serverOutput, listOf("client/Client.class"))
+        contains(serverOutput, listOf("server/Server.class", "junit/framework/Test.class"))
+    }
+
+    @Test
+    fun `exclude a transitive project dependency`() {
+        buildFile.writeText("")
+
+        file("settings.gradle").appendText(
+            """
+            include "client", "server"
+            """.trimIndent()
+        )
+
+        file("client/src/main/java/client/Client.java").appendText(
+            """
+            package client;
+            public class Client {}
+            """.trimIndent()
+        )
+
+        file("client/build.gradle").appendText(
+            """
+            ${getDefaultBuildScript()}
+            dependencies { implementation "junit:junit:3.8.2" }
+            """.trimIndent()
+        )
+
+        file("server/src/main/java/server/Server.java").appendText(
+            """
+            package server;
+            import client.Client;
+            public class Server {}
+            """.trimIndent()
+        )
+
+        file("server/build.gradle").appendText(
+            """
+            ${getDefaultBuildScript()}
+            dependencies { implementation project(":client") }
+
+            // tag::excludeSpec[]
+            shadeJar {
+               dependencies {
+                   exclude(dependency {
+                       it.moduleGroup == "junit"
+                   })
+               }
+            }
+            // end::excludeSpec[]
+            """.trimIndent()
+        )
+
+        val serverOutput = getFile("server/build/libs/server-1.0-all.jar")
+
+        run(":server:shadeJar")
+
+        serverOutput.exists()
+        doesNotContain(serverOutput, listOf("junit/framework/Test.class"))
+        contains(serverOutput, listOf("client/Client.class", "server/Server.class"))
+    }
+
+    //http://mail-archives.apache.org/mod_mbox/ant-user/200506.mbox/%3C001d01c57756$6dc35da0$dc00a8c0@CTEGDOMAIN.COM%3E
+    @Test
+    fun `verify exclude precedence over include`() {
+        buildFile.appendText(
+            """
+            // tag::excludeOverInclude[]
+            shadeJar {
+               include "*.jar"
+               include "*.properties"
+               exclude "a2.properties"
+            }
+            // end::excludeOverInclude[]
+            """.trimIndent()
+        )
+
+        run("shadeJar")
+
+        contains(output, listOf("a.properties", "b.properties"))
+        doesNotContain(output, listOf("a2.properties"))
+    }
+
+    @Test
+    fun `handle exclude with circular dependency`() {
+        repo.module("shade", "c", "1.0")
+            .insertFile("c.properties", "c")
+            .dependsOn("d")
+            .publish()
+        repo.module("shade", "d", "1.0")
+            .insertFile("d.properties", "d")
+            .dependsOn("c")
+            .publish()
+
+        buildFile.appendText(
+            """
+            dependencies {
+                implementation "shade:d:1.0"
+            }
+
+            shadeJar {
+                dependencies {
+                    exclude(dependency("shade:d:1.0"))
+                }
+            }
+            """.trimIndent()
+        )
+
+        run("shadeJar")
+
+        contains(output, listOf("a.properties", "a2.properties", "b.properties", "c.properties"))
+        doesNotContain(output, listOf("d.properties"))
+    }
 }

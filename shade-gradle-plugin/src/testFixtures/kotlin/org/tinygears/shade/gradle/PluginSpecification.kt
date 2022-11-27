@@ -48,7 +48,7 @@ abstract class PluginSpecification {
         get() = file("settings.gradle")
 
     val output: File
-        get() = getFile("build/libs/shadow-1.0-all.jar")
+        get() = getFile("build/libs/shade-1.0-all.jar")
 
     val runner: GradleRunner
         get() = GradleRunner.create()
@@ -64,7 +64,8 @@ abstract class PluginSpecification {
         buildFile.appendText(getDefaultBuildScript())
         settingsFile.appendText(
             """
-            rootProject.name = 'shadow'
+            rootProject.name = 'shade'
+            
             """.trimIndent()
         )
     }
